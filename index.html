@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de IMC - Dark Edition</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            /* Fundo preto fosco */
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #1e1e1e;
+            /* Painel cinza escuro */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid #2d2d2d;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888888;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b3b3b3;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background-color: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00adb5;
+            /* Destaque azul ciano ao clicar */
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #00adb5;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        button:hover {
+            background-color: #008f95;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .result-container {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #252525;
+            border-radius: 6px;
+            border-left: 4px solid #00adb5;
+            display: none;
+            /* Fica oculto até calcular */
+        }
+
+        .result-title {
+            font-size: 14px;
+            color: #888888;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .result-class {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Cores dinâmicas para o texto da classificação */
+        .normal {
+            color: #00e676;
+        }
+
+        /* Verde */
+        .alerta {
+            color: #ffd600;
+        }
+
+        /* Amarelo */
+        .perigo {
+            color: #ff1744;
+        }
+
+        /* Vermelho */
+
+        .error-message {
+            color: #ff1744;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Calculadora de IMC</h1>
+        <p class="subtitle">Lógica baseada no script em Python</p>
+
+        <div class="input-group">
+            <label for="peso">Peso (kg):</label>
+            <input type="number" id="peso" step="0.1" placeholder="Ex: 70.5" required>
+            <div id="error-peso" class="error-message">Por favor, insira um peso válido.</div>
+        </div>
+
+        <div class="input-group">
+            <label for="altura">Altura (m):</label>
+            <input type="number" id="altura" step="0.01" placeholder="Ex: 1.75" required>
+            <div id="error-altura" class="error-message">Por favor, insira uma altura válida.</div>
+        </div>
+
+        <button onclick="processarIMC()">Calcular IMC</button>
+
+        <div id="resultado" class="result-container">
+            <div class="result-title">RESULTADO:</div>
+            <div id="imc-num" class="result-value">--</div>
+            <div id="imc-class" class="result-class">--</div>
+        </div>
+    </div>
+
+    <script>
+        // Equivalente à função 'calcular_imc' do Python
+        function calcularIMC(peso, altura) {
+            return peso / (altura * altura);
+        }
+
+        // Equivalente à função 'classificar_imc' do Python (com adição de cores de estilo)
+        function classificarIMC(imc) {
+            if (imc < 18.5) {
+                return { texto: "Abaixo do peso", classe: "alerta" };
+            } else if (imc >= 18.5 && imc < 25) {
+                return { texto: "Peso normal (parabéns!)", classe: "normal" };
+            } else if (imc >= 25 && imc < 30) {
+                return { texto: "Sobrepeso", classe: "alerta" };
+            } else if (imc >= 30 && imc < 35) {
+                return { texto: "Obesidade Grau 1", classe: "perigo" };
+            } else if (imc >= 35 && imc < 40) {
+                return { texto: "Obesidade Grau 2", classe: "perigo" };
+            } else {
+                return { texto: "Obesidade Grau 3 (mórbida)", classe: "perigo" };
+            }
+        }
+
+        // Fluxo principal (captura dados, valida e exibe os resultados)
+        function processarIMC() {
+            const pesoInput = document.getElementById('peso');
+            const alturaInput = document.getElementById('altura');
+
+            const peso = parseFloat(pesoInput.value);
+            const altura = parseFloat(alturaInput.value);
+
+            let valido = true;
+
+            // Validação (Equivalente ao bloco except ValueError do Python)
+            if (isNaN(peso) || peso <= 0) {
+                document.getElementById('error-peso').style.display = 'block';
+                valido = false;
+            } else {
+                document.getElementById('error-peso').style.display = 'none';
+            }
+
+            if (isNaN(altura) || altura <= 0) {
+                document.getElementById('error-altura').style.display = 'block';
+                valido = false;
+            } else {
+                document.getElementById('error-altura').style.display = 'none';
+            }
+
+            if (!valido) {
+                document.getElementById('resultado').style.display = 'none';
+                return;
+            }
+
+            // Executa as lógicas matemáticas
+            const imc = calcularIMC(peso, altura);
+            const classificacao = classificarIMC(imc);
+
+            // Atualiza os dados na tela
+            document.getElementById('imc-num').innerText = imc.toFixed(2); // .toFixed(2) é o :.2f do Python
+
+            const classElement = document.getElementById('imc-class');
+            classElement.innerText = classificacao.texto;
+
+            // Aplica a cor do texto dependendo da gravidade (Verde, Amarelo ou Vermelho)
+            classElement.className = "result-class " + classificacao.classe;
+
+            // Torna a caixinha de resultado visível
+            document.getElementById('resultado').style.display = 'block';
+        }
+    </script>
+
+</body>
+
+</html>
