@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GymFit - IMC & Ficha de Academia</title>
+    <title>GymFit - Calculadora de IMC Independente</title>
     <style>
-        /* --- ESTILOS GERAIS --- */
+        /* --- ESTILOS INTERFACE DARK (PRETO/CIANO) --- */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -16,8 +16,9 @@
 
         body {
             background-color: #121212;
-            /* Fundo preto fosco */
+            /* Fundo geral preto fosco */
             color: #e0e0e0;
+            /* Texto claro para contraste */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -25,62 +26,28 @@
             padding: 20px;
         }
 
-        /* --- CONTAINER DO APP --- */
+        /* Painel centralizado onde fica a calculadora */
         .container {
             background-color: #1e1e1e;
-            /* Painel cinza escuro */
+            /* Cinza escuro */
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
             width: 100%;
-            max-width: 500px;
+            max-width: 450px;
             border: 1px solid #2d2d2d;
-        }
-
-        /* --- MENUS DE ABAS --- */
-        .tab-container {
-            display: flex;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #2d2d2d;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            background: none;
-            border: none;
-            color: #888888;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        /* Cor ativa da aba */
-        .tab-btn.active {
-            color: #00adb5;
-            /* Ciano */
-            border-bottom: 2px solid #00adb5;
-        }
-
-        /* Exibição dos blocos de conteúdo */
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
         }
 
         h2 {
             color: #ffffff;
-            margin-bottom: 20px;
-            font-size: 22px;
+            margin-bottom: 25px;
+            font-size: 24px;
             text-align: center;
+            border-bottom: 2px solid #2d2d2d;
+            padding-bottom: 10px;
         }
 
-        /* --- CAMPOS DE ENTRADA --- */
+        /* Grupos de espaçamento dos campos de texto */
         .input-group {
             margin-bottom: 20px;
         }
@@ -92,12 +59,11 @@
             font-size: 14px;
         }
 
-        input,
-        select,
-        textarea {
+        input {
             width: 100%;
             padding: 12px;
             background-color: #2a2a2a;
+            /* Caixa de texto cinza ligeiramente mais clara */
             border: 1px solid #3a3a3a;
             border-radius: 6px;
             color: #ffffff;
@@ -105,23 +71,19 @@
             transition: border-color 0.3s ease;
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
+        /* Efeito visual de foco ao clicar no campo para digitar */
+        input:focus {
             outline: none;
             border-color: #00adb5;
+            /* Borda acende em ciano */
         }
 
-        /* --- BOTÃO PRINCIPAL --- */
+        /* Botão de envio principal */
         button.action-btn {
             width: 100%;
             padding: 14px;
             background-color: #00adb5;
+            /* Botão Ciano */
             color: #ffffff;
             border: none;
             border-radius: 6px;
@@ -133,13 +95,15 @@
 
         button.action-btn:hover {
             background-color: #008f95;
+            /* Escurece no hover */
         }
 
         button.action-btn:active {
             transform: scale(0.98);
+            /* Efeito de clique físico */
         }
 
-        /* --- MENUS DE RESULTADOS --- */
+        /* Caixa de exibição do resultado (fica oculta por padrão) */
         .result-container {
             margin-top: 25px;
             padding: 15px;
@@ -157,7 +121,7 @@
         }
 
         .result-value {
-            font-size: 26px;
+            font-size: 28px;
             font-weight: bold;
             color: #ffffff;
             margin-bottom: 5px;
@@ -168,184 +132,113 @@
             font-weight: 500;
         }
 
-        /* Cores semafóricas dinâmicas */
+        /* Classes semafóricas para alteração de cor dinâmica via JavaScript */
         .normal {
             color: #00e676;
         }
 
+        /* Verde */
         .alerta {
             color: #ffd600;
         }
 
+        /* Amarelo */
         .perigo {
             color: #ff1744;
         }
 
-        .resumo-item {
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .resumo-item strong {
-            color: #00adb5;
-        }
+        /* Vermelho */
     </style>
 </head>
 
 <body>
 
     <div class="container">
+        <h2>Calculadora de IMC</h2>
 
-        <div class="tab-container">
-            <button class="tab-btn active" onclick="alternarAba('aba-imc', this)">Calculadora IMC</button>
-            <button class="tab-btn" onclick="alternarAba('aba-academia', this)">Ficha Academia</button>
+        <div class="input-group">
+            <label for="peso">Peso (kg):</label>
+            <input type="number" id="peso" step="0.1" placeholder="Ex: 70.5">
         </div>
 
-        <div id="aba-imc" class="tab-content active">
-            <h2>Cálculo de IMC</h2>
-            <div class="input-group">
-                <label for="peso">Peso (kg):</label>
-                <input type="number" id="peso" step="0.1" placeholder="Ex: 70.5">
-            </div>
-
-            <div class="input-group">
-                <label for="altura">Altura (m):</label>
-                <input type="number" id="altura" step="0.01" placeholder="Ex: 1.75">
-            </div>
-
-            <button class="action-btn" onclick="enviarIMCaoPython()">Calcular no Python</button>
-
-            <div id="resultado-imc-box" class="result-container">
-                <div class="result-title">Retorno do Python:</div>
-                <div id="imc-num" class="result-value">--</div>
-                <div id="imc-class" class="result-class">--</div>
-            </div>
+        <div class="input-group">
+            <label for="altura">Altura (m):</label>
+            <input type="number" id="altura" step="0.01" placeholder="Ex: 1.75">
         </div>
 
-        <div id="aba-academia" class="tab-content">
-            <h2>Anamnese Inicial</h2>
+        <button class="action-btn" onclick="processarIMCLocal()">Calcular IMC</button>
 
-            <div class="input-group">
-                <label for="cardiaco">Possui algum problema cardíaco histórico?</label>
-                <select id="cardiaco">
-                    <option value="Não">Não possuo</option>
-                    <option value="Sim">Sim (Hipertensão, arritmia, sopro, etc.)</option>
-                </select>
-            </div>
-
-            <div class="input-group">
-                <label for="alergias">Possui alguma alergia?</label>
-                <input type="text" id="alergias" placeholder="Ex: Nenhuma, ou Dipirona, Lactose, Glúten...">
-            </div>
-
-            <div class="input-group">
-                <label for="doencas">Possui outra doença, dores crônicas ou lesões?</label>
-                <textarea id="doencas" placeholder="Ex: Diabetes, Asma, Dor crônica no joelho..."></textarea>
-            </div>
-
-            <div class="input-group">
-                <label for="tempo">Quanto tempo tem disponível para treinar por dia?</label>
-                <select id="tempo">
-                    <option value="Até 45 minutos">Rápido (Até 45 min)</option>
-                    <option value="De 1h a 1h30">Padrão (De 1h a 1h30)</option>
-                    <option value="Mais de 1h30">Avançado (Mais de 1h30)</option>
-                </select>
-            </div>
-
-            <div class="input-group">
-                <label for="dias">Quantos dias na semana pretende treinar?</label>
-                <select id="dias">
-                    <option value="1 a 2 dias">1 a 2 dias</option>
-                    <option value="3 a 4 dias">3 a 4 dias (Recomendado)</option>
-                    <option value="5 a 7 dias">5 a 7 dias</option>
-                </select>
-            </div>
-
-            <button class="action-btn" onclick="enviarFichaAoPython()">Salvar no Python</button>
-
-            <div id="resultado-ficha-box" class="result-container">
-                <div id="feedback-python" class="result-title" style="color: #00e676; font-weight: bold;"></div>
-                <div id="resumo-dados" style="margin-top: 10px;"></div>
-            </div>
+        <div id="resultado-imc-box" class="result-container">
+            <div class="result-title">Resultado (Salvo no Navegador):</div>
+            <div id="imc-num" class="result-value">--</div>
+            <div id="imc-class" class="result-class">--</div>
         </div>
-
     </div>
 
     <script>
-        // Gerenciador de navegação das Abas
-        function alternarAba(idAba, botaoClicado) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(idAba).classList.add('active');
-            botaoClicado.classList.add('active');
-        }
-
-        // Envio dos dados de IMC para a API Flask do Python
-        async function enviarIMCaoPython() {
+        function processarIMCLocal() {
+            // Captura e converte os valores digitados nos inputs para números decimais
             const peso = parseFloat(document.getElementById('peso').value);
             const altura = parseFloat(document.getElementById('altura').value);
 
+            // Validação simples para conferir se os campos não estão em branco ou zerados
             if (!peso || !altura || peso <= 0 || altura <= 0) {
-                alert("Insira valores numéricos válidos para peso e altura.");
+                alert("Por favor, insira valores numéricos válidos para peso e altura.");
                 return;
             }
 
-            try {
-                const resposta = await fetch('http://127.0.0.1:5000/api/imc', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ peso: peso, altura: altura })
-                });
+            // Aplica a fórmula matemática do IMC: peso / (altura * altura)
+            const imc = peso / (altura * altura);
 
-                const dados = await resposta.json();
+            // Inicializa as variáveis de texto e cor que vão mudar dinamicamente
+            let classificacao = "";
+            let classeCss = "";
 
-                // Injeta as respostas devolvidas pelo Python na interface
-                document.getElementById('imc-num').innerText = dados.imc;
-                const classElement = document.getElementById('imc-class');
-                classElement.innerText = dados.classificacao;
-                classElement.className = "result-class " + dados.classe_css;
-
-                document.getElementById('resultado-imc-box').style.display = 'block';
-            } catch (erro) {
-                alert("Erro de conexão! Certifique-se de que o script 'app.py' está rodando no terminal.");
+            // Estrutura condicional para classificar a faixa de peso baseada na OMS
+            if (imc < 18.5) {
+                classificacao = "Abaixo do peso";
+                classeCss = "alerta"; // Cor amarela
+            } else if (imc >= 18.5 && imc < 25) {
+                classificacao = "Peso normal (parabéns!)";
+                classeCss = "normal"; // Cor verde
+            } else if (imc >= 25 && imc < 30) {
+                classificacao = "Sobrepeso";
+                classeCss = "alerta"; // Cor amarela
+            } else if (imc >= 30 && imc < 35) {
+                classificacao = "Obesidade Grau 1";
+                classeCss = "perigo"; // Cor vermelha
+            } else if (imc >= 35 && imc < 40) {
+                classificacao = "Obesidade Grau 2";
+                classeCss = "perigo"; // Cor vermelha
+            } else {
+                classificacao = "Obesidade Grau 3 (mórbida)";
+                classeCss = "perigo"; // Cor vermelha
             }
-        }
 
-        // Envio dos dados da Academia para a API Flask do Python
-        async function enviarFichaAoPython() {
-            const dadosFicha = {
-                cardiaco: document.getElementById('cardiaco').value,
-                alergias: document.getElementById('alergias').value,
-                doencas: document.getElementById('doencas').value,
-                tempo: document.getElementById('tempo').value,
-                dias: document.getElementById('dias').value
+            // Cria um objeto com os dados calculados para guardar no armazenamento local
+            const dadosIMC = {
+                peso: peso,
+                altura: altura,
+                imc: imc.toFixed(2), // Limita o valor em duas casas decimais
+                classificacao: classificacao
             };
 
-            try {
-                const resposta = await fetch('http://127.0.0.1:5000/api/ficha', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dadosFicha)
-                });
+            // CORRIGIDO: Removido o caractere '#' que causava erro de sintaxe.
+            // O navegador salva esse histórico internamente em formato de texto (JSON)
+            localStorage.setItem('historico_imc', JSON.stringify(dadosIMC));
 
-                const dados = await resposta.json();
+            // Atualiza o número do IMC na interface gráfica
+            document.getElementById('imc-num').innerText = imc.toFixed(2);
 
-                // Renderiza o feedback do servidor Python na tela
-                document.getElementById('feedback-python').innerText = dados.mensagem;
+            // Captura o elemento do texto classificatório
+            const txtClassificacao = document.getElementById('imc-class');
+            txtClassificacao.innerText = classificacao;
 
-                const resumoHTML = `
-                <div class="resumo-item"><strong>Cardíaco:</strong> ${dados.resumo.cardiaco}</div>
-                <div class="resumo-item"><strong>Alergias:</strong> ${dados.resumo.alergias}</div>
-                <div class="resumo-item"><strong>Restrições:</strong> ${dados.resumo.doencas}</div>
-                <div class="resumo-item"><strong>Tempo/Dia:</strong> ${dados.resumo.tempo}</div>
-                <div class="resumo-item"><strong>Frequência:</strong> ${dados.resumo.dias}</div>
-            `;
+            // Altera a classe CSS para mudar a cor do texto dependendo da faixa de peso
+            txtClassificacao.className = "result-class " + classeCss;
 
-                document.getElementById('resumo-dados').innerHTML = resumoHTML;
-                document.getElementById('resultado-ficha-box').style.display = 'block';
-            } catch (erro) {
-                alert("Erro de conexão! O servidor Flask (app.py) precisa estar ativo.");
-            }
+            // Modifica a propriedade display para tornar visível a caixa de resultado
+            document.getElementById('resultado-imc-box').style.display = 'block';
         }
     </script>
 </body>
