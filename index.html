@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GymFit - Calculadora de IMC Independente</title>
+    <title>GymFit - Sistema de Avaliação Independente</title>
     <style>
         /* --- ESTILOS INTERFACE DARK (PRETO/CIANO) --- */
         * {
@@ -26,7 +26,7 @@
             padding: 20px;
         }
 
-        /* Painel centralizado onde fica a calculadora */
+        /* Painel centralizado que se adapta ao tamanho do conteúdo */
         .container {
             background-color: #1e1e1e;
             /* Cinza escuro */
@@ -34,45 +34,109 @@
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
             width: 100%;
-            max-width: 450px;
+            max-width: 550px;
             border: 1px solid #2d2d2d;
+        }
+
+        /* --- SISTEMA DE ABAS (TABS) --- */
+        .tab-container {
+            display: flex;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #2d2d2d;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: #888888;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        /* Controla o visual do botão da aba que está selecionada */
+        .tab-btn.active {
+            color: #00adb5;
+            border-bottom: 2px solid #00adb5;
+        }
+
+        /* Oculta o conteúdo das abas por padrão */
+        .tab-content {
+            display: none;
+        }
+
+        /* Exibe apenas a aba que tiver a classe 'active' */
+        .tab-content.active {
+            display: block;
         }
 
         h2 {
             color: #ffffff;
-            margin-bottom: 25px;
-            font-size: 24px;
+            margin-bottom: 20px;
+            font-size: 22px;
             text-align: center;
-            border-bottom: 2px solid #2d2d2d;
-            padding-bottom: 10px;
+        }
+
+        /* Subtítulos dentro da ficha de avaliação */
+        h3 {
+            color: #00adb5;
+            font-size: 16px;
+            margin: 20px 0 10px 0;
+            border-bottom: 1px solid #3a3a3a;
+            padding-bottom: 5px;
         }
 
         /* Grupos de espaçamento dos campos de texto */
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+        }
+
+        /* Permite colocar dois campos menores na mesma linha (ex: braço esquerdo e direito) */
+        .input-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .input-row .input-group {
+            flex: 1;
+            margin-bottom: 0;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: #b3b3b3;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        input {
+        input,
+        select,
+        textarea {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             background-color: #2a2a2a;
             /* Caixa de texto cinza ligeiramente mais clara */
             border: 1px solid #3a3a3a;
             border-radius: 6px;
             color: #ffffff;
-            font-size: 15px;
+            font-size: 14px;
             transition: border-color 0.3s ease;
         }
 
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
         /* Efeito visual de foco ao clicar no campo para digitar */
-        input:focus {
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: #00adb5;
             /* Borda acende em ciano */
@@ -90,17 +154,13 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 15px;
+            transition: background-color 0.3s ease;
         }
 
         button.action-btn:hover {
             background-color: #008f95;
             /* Escurece no hover */
-        }
-
-        button.action-btn:active {
-            transform: scale(0.98);
-            /* Efeito de clique físico */
         }
 
         /* Caixa de exibição do resultado (fica oculta por padrão) */
@@ -132,7 +192,7 @@
             font-weight: 500;
         }
 
-        /* Classes semafóricas para alteração de cor dinâmica via JavaScript */
+        /* Classes semafóricas para alteração de cor dinâmica */
         .normal {
             color: #00e676;
         }
@@ -148,97 +208,204 @@
         }
 
         /* Vermelho */
+
+        .resumo-item {
+            font-size: 14px;
+            margin-bottom: 6px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 4px;
+        }
+
+        .resumo-item strong {
+            color: #00adb5;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="container">
-        <h2>Calculadora de IMC</h2>
 
-        <div class="input-group">
-            <label for="peso">Peso (kg):</label>
-            <input type="number" id="peso" step="0.1" placeholder="Ex: 70.5">
+        <div class="tab-container">
+            <button class="tab-btn active" onclick="alternarAba('aba-imc', this)">Calculadora IMC</button>
+            <button class="tab-btn" onclick="alternarAba('aba-avaliacao', this)">Avaliação Física</button>
         </div>
 
-        <div class="input-group">
-            <label for="altura">Altura (m):</label>
-            <input type="number" id="altura" step="0.01" placeholder="Ex: 1.75">
+        <div id="aba-imc" class="tab-content active">
+            <h2>Cálculo de IMC</h2>
+
+            <div class="input-group">
+                <label for="peso">Peso (kg):</label>
+                <input type="number" id="peso" step="0.1" placeholder="Ex: 70.5">
+            </div>
+
+            <div class="input-group">
+                <label for="altura">Altura (m):</label>
+                <input type="number" id="altura" step="0.01" placeholder="Ex: 1.75">
+            </div>
+
+            <button class="action-btn" onclick="processarIMCLocal()">Calcular IMC</button>
+
+            <div id="resultado-imc-box" class="result-container">
+                <div class="result-title">Resultado (Salvo no Navegador):</div>
+                <div id="imc-num" class="result-value">--</div>
+                <div id="imc-class" class="result-class">--</div>
+            </div>
         </div>
 
-        <button class="action-btn" onclick="processarIMCLocal()">Calcular IMC</button>
+        <div id="aba-avaliacao" class="tab-content">
+            <h2>Ficha de Avaliação Física</h2>
 
-        <div id="resultado-imc-box" class="result-container">
-            <div class="result-title">Resultado (Salvo no Navegador):</div>
-            <div id="imc-num" class="result-value">--</div>
-            <div id="imc-class" class="result-class">--</div>
+            <h3>1. Dados Cadastrais & Objetivos</h3>
+            <div class="input-group">
+                <label for="aval-nome">Nome do Aluno:</label>
+                <input type="text" id="aval-nome" placeholder="Ex: João Silva">
+            </div>
+
+            <div class="input-group">
+                <label for="aval-objetivo">Objetivo Principal:</label>
+                <select id="aval-objetivo">
+                    <option value="Hipertrofia">Hipertrofia (Ganho de Massa Muscular)</option>
+                    <option value="Emagrecimento">Emagrecimento / Definição</option>
+                    <option value="Condicionamento">Condicionamento Físico / Saúde</option>
+                    <option value="Força">Ganho de Força Bruta</option>
+                </select>
+            </div>
+
+            <h3>2. Perímetros Corporais (Medidas em cm)</h3>
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="med-torax">Tórax:</label>
+                    <input type="number" id="med-torax" step="0.1" placeholder="95.0">
+                </div>
+                <div class="input-group">
+                    <label for="med-cintura">Cintura/Abdomen:</label>
+                    <input type="number" id="med-cintura" step="0.1" placeholder="82.0">
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="med-braco-d">Braço Direito:</label>
+                    <input type="number" id="med-braco-d" step="0.1" placeholder="34.5">
+                </div>
+                <div class="input-group">
+                    <label for="med-braco-e">Braço Esquerdo:</label>
+                    <input type="number" id="med-braco-e" step="0.1" placeholder="34.2">
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="med-coxa-d">Coxa Direita:</label>
+                    <input type="number" id="med-coxa-d" step="0.1" placeholder="55.0">
+                </div>
+                <div class="input-group">
+                    <label for="med-coxa-e">Coxa Esquerda:</label>
+                    <input type="number" id="med-coxa-e" step="0.1" placeholder="54.8">
+                </div>
+            </div>
+
+            <h3>3. Observações Clínicas</h3>
+            <div class="input-group">
+                <label for="aval-obs">Limitações, lesões ou observações adicionais:</label>
+                <textarea id="aval-obs"
+                    placeholder="Ex: Dor crônica no joelho direito, hipertensão controlada..."></textarea>
+            </div>
+
+            <button class="action-btn" onclick="salvarAvaliacaoLocal()">Salvar Avaliação Física</button>
+
+            <div id="resultado-avaliacao-box" class="result-container">
+                <div class="result-title" style="color: #00e676; font-weight: bold; margin-bottom: 12px;">✓ Avaliação
+                    Gravada na Memória Local!</div>
+                <div id="resumo-avaliacao-dados"></div>
+            </div>
         </div>
+
     </div>
 
     <script>
+        // Função que alterna a visibilidade das abas na tela
+        function alternarAba(idAba, botaoClicado) {
+            // Remove a classe ativa de todas as abas e botões
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+            // Ativa apenas a aba clicada e aplica o traço ciano embaixo do botão correspondente
+            document.getElementById(idAba).classList.add('active');
+            botaoClicado.classList.add('active');
+        }
+
+        // LÓGICA DA ABA 1: PROCESSA O IMC
         function processarIMCLocal() {
-            // Captura e converte os valores digitados nos inputs para números decimais
             const peso = parseFloat(document.getElementById('peso').value);
             const altura = parseFloat(document.getElementById('altura').value);
 
-            // Validação simples para conferir se os campos não estão em branco ou zerados
             if (!peso || !altura || peso <= 0 || altura <= 0) {
                 alert("Por favor, insira valores numéricos válidos para peso e altura.");
                 return;
             }
 
-            // Aplica a fórmula matemática do IMC: peso / (altura * altura)
             const imc = peso / (altura * altura);
-
-            // Inicializa as variáveis de texto e cor que vão mudar dinamicamente
             let classificacao = "";
             let classeCss = "";
 
-            // Estrutura condicional para classificar a faixa de peso baseada na OMS
-            if (imc < 18.5) {
-                classificacao = "Abaixo do peso";
-                classeCss = "alerta"; // Cor amarela
-            } else if (imc >= 18.5 && imc < 25) {
-                classificacao = "Peso normal (parabéns!)";
-                classeCss = "normal"; // Cor verde
-            } else if (imc >= 25 && imc < 30) {
-                classificacao = "Sobrepeso";
-                classeCss = "alerta"; // Cor amarela
-            } else if (imc >= 30 && imc < 35) {
-                classificacao = "Obesidade Grau 1";
-                classeCss = "perigo"; // Cor vermelha
-            } else if (imc >= 35 && imc < 40) {
-                classificacao = "Obesidade Grau 2";
-                classeCss = "perigo"; // Cor vermelha
-            } else {
-                classificacao = "Obesidade Grau 3 (mórbida)";
-                classeCss = "perigo"; // Cor vermelha
-            }
+            if (imc < 18.5) { classificacao = "Abaixo do peso"; classeCss = "alerta"; }
+            else if (imc >= 18.5 && imc < 25) { classificacao = "Peso normal (parabéns!)"; classeCss = "normal"; }
+            else if (imc >= 25 && imc < 30) { classificacao = "Sobrepeso"; classeCss = "alerta"; }
+            else if (imc >= 30 && imc < 35) { classificacao = "Obesidade Grau 1"; classeCss = "perigo"; }
+            else if (imc >= 35 && imc < 40) { classificacao = "Obesidade Grau 2"; classeCss = "perigo"; }
+            else { classificacao = "Obesidade Grau 3 (mórbida)"; classeCss = "perigo"; }
 
-            // Cria um objeto com os dados calculados para guardar no armazenamento local
-            const dadosIMC = {
-                peso: peso,
-                altura: altura,
-                imc: imc.toFixed(2), // Limita o valor em duas casas decimais
-                classificacao: classificacao
-            };
-
-            // CORRIGIDO: Removido o caractere '#' que causava erro de sintaxe.
-            // O navegador salva esse histórico internamente em formato de texto (JSON)
+            const dadosIMC = { peso: peso, altura: altura, imc: imc.toFixed(2), classificacao: classificacao };
             localStorage.setItem('historico_imc', JSON.stringify(dadosIMC));
 
-            // Atualiza o número do IMC na interface gráfica
             document.getElementById('imc-num').innerText = imc.toFixed(2);
-
-            // Captura o elemento do texto classificatório
             const txtClassificacao = document.getElementById('imc-class');
             txtClassificacao.innerText = classificacao;
-
-            // Altera a classe CSS para mudar a cor do texto dependendo da faixa de peso
             txtClassificacao.className = "result-class " + classeCss;
 
-            // Modifica a propriedade display para tornar visível a caixa de resultado
             document.getElementById('resultado-imc-box').style.display = 'block';
+        }
+
+        // LÓGICA DA ABA 2: PROCESSA E SALVA A NOVA AVALIAÇÃO FÍSICA
+        function salvarAvaliacaoLocal() {
+            // Coleta o valor do nome e higieniza espaços vazios
+            const nomeAluno = document.getElementById('aval-nome').value.trim();
+
+            if (!nomeAluno) {
+                alert("Por favor, digite o nome do aluno antes de salvar a ficha.");
+                return;
+            }
+
+            // Cria o objeto contendo todas as medidas recolhidas do formulário estilo academia
+            const fichaAvaliacao = {
+                aluno: nomeAluno,
+                objetivo: document.getElementById('aval-objetivo').value,
+                torax: document.getElementById('med-torax').value || "Não medido",
+                cintura: document.getElementById('med-cintura').value || "Não medido",
+                bracoD: document.getElementById('med-braco-d').value || "Não medido",
+                bracoE: document.getElementById('med-braco-e').value || "Não medido",
+                coxaD: document.getElementById('med-coxa-d').value || "Não medido",
+                coxaE: document.getElementById('med-coxa-e').value || "Não medido",
+                observacoes: document.getElementById('aval-obs').value.trim() || "Nenhuma observação informada."
+            };
+
+            // Salva de forma persistente os dados da avaliação no navegador do usuário
+            localStorage.setItem('ficha_avaliacao_fisica', JSON.stringify(fichaAvaliacao));
+
+            // Renderiza e exibe de forma elegante o resumo estruturado na tela
+            document.getElementById('resumo-avaliacao-dados').innerHTML = `
+            <div class="resumo-item"><strong>Aluno:</strong> ${fichaAvaliacao.aluno}</div>
+            <div class="resumo-item"><strong>Foco:</strong> ${fichaAvaliacao.objetivo}</div>
+            <div class="resumo-item"><strong>Torax / Cintura:</strong> ${fichaAvaliacao.torax}cm / ${fichaAvaliacao.cintura}cm</div>
+            <div class="resumo-item"><strong>Braço (D/E):</strong> ${fichaAvaliacao.bracoD}cm / ${fichaAvaliacao.bracoE}cm</div>
+            <div class="resumo-item"><strong>Coxa (D/E):</strong> ${fichaAvaliacao.coxaD}cm / ${fichaAvaliacao.coxaE}cm</div>
+            <div class="resumo-item"><strong>Histórico Clínico:</strong> ${fichaAvaliacao.observacoes}</div>
+        `;
+
+            // Torna visível o painel inferior de resposta
+            document.getElementById('resultado-avaliacao-box').style.display = 'block';
         }
     </script>
 </body>
