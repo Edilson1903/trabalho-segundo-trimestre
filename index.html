@@ -86,7 +86,7 @@
         }
 
         .input-group {
-            /* Controla os blocks individuais de rótulo e campo de texto */
+            /* Controla os blocos individuais de rótulo e campo de texto */
             margin-bottom: 15px;
             /* Afasta um grupo de entrada do outro */
         }
@@ -191,6 +191,39 @@
             /* Controla o comportamento quando o mouse passa sobre o botão */
             background-color: #008f95;
             /* Muda a cor para um tom de ciano mais escuro */
+        }
+
+        /* NOVO ESTILO: BOTÃO DE EXCLUIR (VERMELHO) */
+        button.delete-btn {
+            /* Estiliza especificamente o botão secundário de exclusão */
+            width: 100%;
+            /* Faz o botão ocupar 100% da largura */
+            padding: 10px;
+            /* Espaçamento ligeiramente menor que o botão principal */
+            background-color: #ff1744;
+            /* Cor de fundo vermelha vibrante para sinalizar alerta/exclusão */
+            color: #ffffff;
+            /* Letras em cor branca pura */
+            border: none;
+            /* Remove as bordas industriais padrão */
+            border-radius: 6px;
+            /* Arredonda os cantos do botão */
+            font-size: 14px;
+            /* Fonte ligeiramente menor que a do botão principal */
+            font-weight: bold;
+            /* Coloca o texto em negrito */
+            cursor: pointer;
+            /* Modifica o cursor para o ícone de mão de clique */
+            margin-top: 10px;
+            /* Dá uma folga de espaçamento em relação ao botão de cima */
+            transition: background-color 0.3s ease;
+            /* Suaviza a troca de cor ao interagir */
+        }
+
+        button.delete-btn:hover {
+            /* Controla o visual do botão vermelho ao passar o mouse */
+            background-color: #b2102f;
+            /* Escurece o vermelho para um tom de vinho discreto */
         }
 
         .result-container {
@@ -306,13 +339,15 @@
                 id="aval-obs" placeholder="Ex: Nenhuma lesão. Relata dor leve no ombro ao fazer supino..."></textarea>
         </div> <button class="action-btn" onclick="salvarFichaEProcessarIMC()">Salvar Ficha & Calcular IMC</button>
 
+        <button class="delete-btn" onclick="excluirFichaLocal()">Excluir Ficha</button>
+
         <div id="resultado-box" class="result-container">
             <div class="result-title" style="color: #00e676;">✓ Ficha Gravada e IMC Processado!</div>
             <div id="resumo-dados-completos"></div>
         </div>
     </div>
     <script> // FUNÇÃO PRINCIPAL: CAPTURA OS DADOS, COMPUTA O IMC E GRAVA NA MEMÓRIA DO NAVEGADOR
-        function salvarFichaEProcessarIMC() { // Declaração da função disparada pelo botão
+        function salvarFichaEProcessarIMC() { // Declaração da função disparada pelo botão de salvar
 
             // 1. CAPTURA E VALIDAÇÃO DOS CAMPOS OBRIGATÓRIOS
             const nomeAluno = document.getElementById('aval-nome').value.trim(); // Coleta o nome removendo espaços em branco extras nas pontas
@@ -389,6 +424,35 @@
 
             // 6. EXIBIÇÃO VISÍVEL DA CAIXA DE RESULTADOS
             document.getElementById('resultado-box').style.display = 'block'; // Transforma a propriedade display para block, fazendo o painel aparecer
+        }
+
+        // NOVA FUNÇÃO: REMOVE OS DADOS DO ARQUIVO LOCAL DO NAVEGADOR E LIMPA A TELA
+        function excluirFichaLocal() { // Cria a função associada ao botão vermelho
+            // Abre um quadro de confirmação na tela perguntando se o usuário realmente deseja apagar os dados
+            if (confirm("Tem certeza que deseja excluir esta avaliação física permanentemente da memória?")) {
+
+                // 1. LIMPEZA DO BANCO DO NAVEGADOR
+                localStorage.removeItem('ficha_avaliacao_completa'); // Remove a chave do banco local
+
+                // 2. LIMPEZA DOS CAMPOS DE TEXTO E MEDIDAS DO FORMULÁRIO (INPUTS)
+                document.getElementById('aval-nome').value = ""; // Limpa a caixa de texto do nome
+                document.getElementById('aval-objetivo').selectedIndex = 0; // Reseta a caixa de seleção para o primeiro item padrão
+                document.getElementById('peso').value = ""; // Limpa o input numérico do peso
+                document.getElementById('altura').value = ""; // Limpa o input numérico da altura
+                document.getElementById('med-torax').value = ""; // Limpa o input do tórax
+                document.getElementById('med-cintura').value = ""; // Limpa o input da cintura
+                document.getElementById('med-braco-d').value = ""; // Limpa o braço direito
+                document.getElementById('med-braco-e').value = ""; // Limpa o braço esquerdo
+                document.getElementById('med-coxa-d').value = ""; // Limpa a coxa direita
+                document.getElementById('med-coxa-e').value = ""; // Limpa a coxa esquerda
+                document.getElementById('aval-obs').value = ""; // Limpa a área de observações clínicas
+
+                // 3. RECUPERAÇÃO DO ESTADO OCULTO DA CAIXA DE RESULTADOS
+                document.getElementById('resultado-box').style.display = 'none'; // Esconde o bloco de resumo da tela
+                document.getElementById('resumo-dados-completos').innerHTML = ""; // Esvazia o conteúdo HTML injetado anteriormente
+
+                alert("Avaliação física excluída com sucesso!"); // Exibe um aviso confirmando a exclusão completa
+            }
         }
     </script>
 </body>
